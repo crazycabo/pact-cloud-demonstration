@@ -86,12 +86,12 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
 # ----------
 # ECS
 # ----------
-resource "aws_ecs_cluster" "app_cluster" {
-  name = "app-cluster"
+resource "aws_ecs_cluster" "pactbroker_app_cluster" {
+  name = "pactbroker_app_cluster"
 }
 
-resource "aws_ecs_task_definition" "app_task" {
-  family                   = "app-task"
+resource "aws_ecs_task_definition" "pactbroker_app_task" {
+  family                   = "pactbroker_app_task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
@@ -99,8 +99,8 @@ resource "aws_ecs_task_definition" "app_task" {
 
   container_definitions = jsonencode([
     {
-      name      = "app-container"
-      image     = "your-docker-image:latest"
+      name      = "pactbroker"
+      image     = "pactfoundation/pact-broker:2.124.0-pactbroker2.112.0"
       essential = true
       portMappings = [
         {
@@ -113,22 +113,22 @@ resource "aws_ecs_task_definition" "app_task" {
   ])
 }
 
-resource "aws_ecs_service" "app_service" {
-  name            = "app-service"
-  cluster         = aws_ecs_cluster.app_cluster.id
-  task_definition = aws_ecs_task_definition.app_task.arn
+resource "aws_ecs_service" "pactbroker_app_service" {
+  name            = "pactbroker_app_service"
+  cluster         = aws_ecs_cluster.pactbroker_app_cluster.id
+  task_definition = aws_ecs_task_definition.pactbroker_app_task.arn
   desired_count   = 2
 
   launch_type = "FARGATE"
 
   network_configuration {
     subnets         = module.vpc.private_subnets
-    security_groups = [aws_security_group.alb_sg.id]
+    security_groups = [aws_security_group.pact_broker_alb_sg.id]
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.app_tg.arn
-    container_name   = "app-container"
+    target_group_arn = aws_lb_target_group.pact_broker_lb_target_group.arn
+    container_name   = "pactbroker"
     container_port   = 80
   }
 }
