@@ -140,7 +140,7 @@ module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "5.0.2"
 
-  identifier = "app-db"
+  identifier = "packbroker-db"
   engine     = "postgres"
   engine_version = "15.2"
   instance_class = "db.t3.micro"
@@ -148,10 +148,10 @@ module "rds" {
   allocated_storage = 20
   storage_encrypted = true
 
-  name     = "appdb"
+  name     = "packbrokerdb"
   username = "admin"
   password = "password"
-  vpc_security_group_ids = [aws_security_group.alb_sg.id]
+  vpc_security_group_ids = [aws_security_group.pact_broker_alb_sg.id]
   subnet_ids = module.vpc.private_subnets
 
   publicly_accessible = false
@@ -160,18 +160,18 @@ module "rds" {
 # ----------
 # DNS
 # ----------
-resource "aws_route53_zone" "app_zone" {
+resource "aws_route53_zone" "ingendev_app_zone" {
   name = "ingendevelopment.com"
 }
 
-resource "aws_route53_record" "app_record" {
-  zone_id = aws_route53_zone.app_zone.zone_id
+resource "aws_route53_record" "packbroker_app_record" {
+  zone_id = aws_route53_zone.ingendev_app_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
   type    = "A"
 
   alias {
-    name                   = aws_lb.app_lb.dns_name
-    zone_id                = aws_lb.app_lb.zone_id
+    name                   = aws_lb.pact_broker_lb.dns_name
+    zone_id                = aws_lb.pact_broker_lb.zone_id
     evaluate_target_health = true
   }
 }
