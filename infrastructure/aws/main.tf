@@ -138,7 +138,7 @@ resource "aws_ecs_service" "pactbroker_app_service" {
 # ----------
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "5.0.2"
+  version = "6.10.0"
 
   identifier = "packbroker-db"
   engine     = "postgres"
