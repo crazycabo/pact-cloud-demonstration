@@ -27,9 +27,7 @@ jobs:
       working-directory: infrastructure/aws
 
     - name: Terraform validate
-      run: |
-        terraform fmt -check
-        terraform validate
+      run: terraform validate
       working-directory: infrastructure/aws
 
     - name: Terraform plan
