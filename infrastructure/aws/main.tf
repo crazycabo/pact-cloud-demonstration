@@ -7,7 +7,7 @@ provider "aws" {
 # ----------
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.19.0"
+  version = "5.17.0"
 
   name = "pact-broker-vpc"
   cidr = "10.0.0.0/16"
@@ -23,7 +23,7 @@ module "vpc" {
 # ALB
 # ----------
 resource "aws_security_group" "pact_broker_alb_sg" {
-  name        = "pact_broker_alb_sg"
+  name        = "pact-broker-alb-sg"
   description = "Allow HTTP and HTTPS traffic"
   vpc_id      = module.vpc.vpc_id
 
@@ -50,7 +50,7 @@ resource "aws_security_group" "pact_broker_alb_sg" {
 }
 
 resource "aws_lb" "pact_broker_lb" {
-  name               = "pact_broker_lb"
+  name               = "pact-broker-lb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.pact_broker_alb_sg.id]
@@ -69,7 +69,7 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
 }
 
 resource "aws_lb_target_group" "pact_broker_lb_target_group" {
-  name     = "pact_broker_lb_target_group"
+  name     = "pact-broker-lb-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = module.vpc.vpc_id
@@ -87,7 +87,7 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
 # ECS
 # ----------
 resource "aws_ecs_cluster" "pactbroker_app_cluster" {
-  name = "pactbroker_app_cluster"
+  name = "pactbroker-app-cluster"
 }
 
 resource "aws_ecs_task_definition" "pactbroker_app_task" {
@@ -114,7 +114,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
 }
 
 resource "aws_ecs_service" "pactbroker_app_service" {
-  name            = "pactbroker_app_service"
+  name            = "pactbroker-app-service"
   cluster         = aws_ecs_cluster.pactbroker_app_cluster.id
   task_definition = aws_ecs_task_definition.pactbroker_app_task.arn
   desired_count   = 2
@@ -138,7 +138,7 @@ resource "aws_ecs_service" "pactbroker_app_service" {
 # ----------
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
-  version = "5.0.2"
+  version = "6.10.0"
 
   identifier = "packbroker-db"
   engine     = "postgres"
@@ -148,7 +148,7 @@ module "rds" {
   allocated_storage = 20
   storage_encrypted = true
 
-  name     = "packbrokerdb"
+  db_name  = "packbrokerdb"
   username = "admin"
   password = "password"
   vpc_security_group_ids = [aws_security_group.pact_broker_alb_sg.id]
