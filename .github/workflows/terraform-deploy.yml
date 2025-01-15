@@ -1,0 +1,38 @@
+name: Deploy AWS infrastructure
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repository checkout
+      uses: actions/checkout@v3
+
+    - name: Terraform setup
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.5.0
+        cli_config_credentials_token: ${{ secrets.TF_CLI_TOKEN }}
+
+    - name: Terraform initialize
+      run: terraform init
+
+    - name: Terraform validate
+      run: |
+        terraform fmt -check
+        terraform validate
+
+    - name: Terraform plan
+      run: terraform plan -out=tf_plan_pact_aws
+
+    - name: Terraform apply (main only)
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve tf_plan_pact_aws
