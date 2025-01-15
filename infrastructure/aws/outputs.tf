@@ -3,7 +3,7 @@ output "alb_dns_name" {
 }
 
 output "rds_endpoint" {
-  value = module.rds.this_rds_instance_address
+  value = module.rds.db_instance_address
 }
 
 output "ecs_cluster_name" {
