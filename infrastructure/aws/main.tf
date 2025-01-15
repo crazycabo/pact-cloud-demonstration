@@ -148,7 +148,7 @@ module "rds" {
   allocated_storage = 20
   storage_encrypted = true
 
-  name     = "packbrokerdb"
+  db_name  = "packbrokerdb"
   username = "admin"
   password = "password"
   vpc_security_group_ids = [aws_security_group.pact_broker_alb_sg.id]
