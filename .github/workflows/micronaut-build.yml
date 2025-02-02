@@ -1,4 +1,4 @@
-name: Build Micronaut Projects
+name: Micronaut Services
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
 
 jobs:
   detect:
-    name: Detect Changed Paths
+    name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
       employee_access_changed: ${{ steps.filter.outputs.employee_access }}
@@ -35,7 +35,7 @@ jobs:
               - 'applications/employee_directory/**'
 
   build:
-    name: Build Project
+    name: Build
     runs-on: ubuntu-latest
     needs: detect
     strategy:
@@ -66,9 +66,6 @@ jobs:
             ${{ runner.os }}-gradle
 
       - name: Build Project ${{ matrix.project }}
-        # This step runs only if:
-        # - The workflow was manually triggered and the selected project matches the matrix value, or
-        # - The workflow was triggered by a PR and the corresponding directory was modified.
         if: >
           (github.event_name == 'workflow_dispatch' && github.event.inputs.project == matrix.project)
           ||
