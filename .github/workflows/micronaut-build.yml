@@ -3,8 +3,8 @@ name: Build Micronaut Projects
 on:
   pull_request:
     paths:
-      - 'alpha/**'
-      - 'bravo/**'
+      - 'applications/employee_access/**'
+      - 'applications/employee_directory/**'
   workflow_dispatch:
     inputs:
       project:
@@ -12,27 +12,27 @@ on:
         required: true
         type: choice
         options:
-          - alpha
-          - bravo
+          - employee_access
+          - employee_directory
 
 jobs:
   detect:
     name: Detect Changed Paths
     runs-on: ubuntu-latest
     outputs:
-      alpha_changed: ${{ steps.filter.outputs.alpha }}
-      bravo_changed: ${{ steps.filter.outputs.bravo }}
+      alpha_changed: ${{ steps.filter.outputs.employee_access }}
+      bravo_changed: ${{ steps.filter.outputs.employee_directory }}
     steps:
       - uses: actions/checkout@v3
-      - name: Filter changed paths
+      - name: Filter updated paths
         id: filter
         uses: dorny/paths-filter@v2
         with:
           filters: |
-            alpha:
-              - 'alpha/**'
-            bravo:
-              - 'bravo/**'
+            employee_access:
+              - 'applications/employee_access/**'
+            employee_directory:
+              - 'applications/employee_directory/**'
 
   build:
     name: Build Project
@@ -40,7 +40,7 @@ jobs:
     needs: detect
     strategy:
       matrix:
-        project: [alpha, bravo]
+        project: [employee_access, employee_directory]
     # Conditional:  
     # - For manual trigger (workflow_dispatch): run only if the input matches the matrix project.  
     # - For PR trigger: run only if the "detect" job flagged that project as changed.
@@ -48,8 +48,8 @@ jobs:
       (github.event_name == 'workflow_dispatch' && github.event.inputs.project == matrix.project)
       ||
       (github.event_name != 'workflow_dispatch' &&
-        ((matrix.project == 'alpha' && needs.detect.outputs.alpha_changed == 'true') ||
-         (matrix.project == 'bravo' && needs.detect.outputs.bravo_changed == 'true')))
+        ((matrix.project == 'employee_access' && needs.detect.outputs.alpha_changed == 'true') ||
+         (matrix.project == 'employee_directory' && needs.detect.outputs.bravo_changed == 'true')))
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
