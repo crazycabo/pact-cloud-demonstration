@@ -78,4 +78,5 @@ jobs:
         run: |
           echo "Building project: ${{ matrix.project }} from directory: ${{ matrix.directory }}"
           cd ${{ matrix.directory }}
+          chmod +x gradlew
           ./gradlew build
