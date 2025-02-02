@@ -42,9 +42,9 @@ jobs:
       matrix:
         include:
           - project: employee_access
-            directory: 'applications/employee_access/**'
+            directory: 'applications/employee_access'
           - project: employee_directory
-            directory: 'applications/employee_directory/**'
+            directory: 'applications/employee_directory'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
