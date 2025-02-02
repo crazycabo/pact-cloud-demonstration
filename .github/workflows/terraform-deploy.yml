@@ -4,9 +4,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'infrastructure/aws/**'
   pull_request:
     branches:
       - main
+    paths:
+      - 'infrastructure/aws/**'
 
 jobs:
   terraform:
