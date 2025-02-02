@@ -40,7 +40,11 @@ jobs:
     needs: detect
     strategy:
       matrix:
-        project: [employee_access, employee_directory]
+        include:
+          - project: employee_access
+            directory: 'applications/employee_access/**'
+          - project: employee_directory
+            directory: 'applications/employee_directory/**'
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -72,6 +76,6 @@ jobs:
             ((matrix.project == 'employee_access' && needs.detect.outputs.employee_access_changed == 'true') ||
              (matrix.project == 'employee_directory' && needs.detect.outputs.employee_directory_changed == 'true')))
         run: |
-          echo "Building project: ${{ matrix.project }}"
-          cd ${{ matrix.project }}
+          echo "Building project: ${{ matrix.project }} from directory: ${{ matrix.directory }}"
+          cd ${{ matrix.directory }}
           ./gradlew build
