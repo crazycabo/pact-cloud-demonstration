@@ -4,6 +4,7 @@ import au.com.dius.pact.consumer.MockServer;
 import au.com.dius.pact.consumer.dsl.PactDslWithProvider;
 import au.com.dius.pact.consumer.junit5.PactConsumerTestExt;
 import au.com.dius.pact.consumer.junit5.PactTestFor;
+import au.com.dius.pact.core.model.PactSpecVersion;
 import au.com.dius.pact.core.model.RequestResponsePact;
 import au.com.dius.pact.core.model.annotations.Pact;
 import com.google.gson.Gson;
@@ -28,23 +29,22 @@ public class EmployeeDirectoryClientPactTest {
         return builder
                 .given("Employee exists with ID 12345")
                 .uponReceiving("A request for an employee's details")
-                .path("/")
+                .path("/employee-directory/12345")
                 .method("GET")
-                .query("employeeId=12345")
                 .willRespondWith()
                 .status(200)
                 .body("""
                     {
                         "fullName": "John Doe",
                         "department": "Engineering",
-                        "phoneNumber": "555-1234"
+                        "phoneNumber": "317-555-5555"
                     }
                 """)
                 .toPact();
     }
 
     @Test
-    @PactTestFor(pactMethod = "employeePact")
+    @PactTestFor(pactMethod = "employeePact", pactVersion = PactSpecVersion.V3)
     void testGetEmployeeInfo(MockServer mockServer) {
 
         HttpResponse<String> response = Unirest.get(mockServer.getUrl() + "/employee-directory/12345")
