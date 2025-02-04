@@ -17,8 +17,13 @@ dependencies {
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
     runtimeOnly("ch.qos.logback:logback-classic")
+    testImplementation("au.com.dius.pact.consumer:junit5:4.6.16")
+    testImplementation("io.micronaut.test:micronaut-test-junit5")
+    testImplementation("io.micronaut:micronaut-http-client")
+    testImplementation("com.konghq:unirest-java-core:4.4.5")
+    testImplementation("org.hamcrest:hamcrest:3.0")
+    implementation("com.google.code.gson:gson:2.12.1")
 }
-
 
 application {
     mainClass = "com.ingendevelopment.Application"
@@ -27,7 +32,6 @@ java {
     sourceCompatibility = JavaVersion.toVersion("21")
     targetCompatibility = JavaVersion.toVersion("21")
 }
-
 
 graalvmNative.toolchainDetection = false
 
@@ -52,9 +56,6 @@ micronaut {
     }
 }
 
-
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
     jdkVersion = "21"
 }
-
-

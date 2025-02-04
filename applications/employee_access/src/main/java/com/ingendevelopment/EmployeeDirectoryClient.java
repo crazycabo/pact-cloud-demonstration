@@ -5,7 +5,7 @@ import io.micronaut.http.client.annotation.Client;
 
 import java.util.Optional;
 
-@Client("http://example.com/employee-directory")
+@Client("https://ingendevelopment.com/employee-directory")
 public interface EmployeeDirectoryClient {
 
     @Get("/{?employeeId}")
