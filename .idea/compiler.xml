@@ -7,7 +7,7 @@
         <option name="micronaut.processing.annotations" value="com.ingendevelopment.*" />
         <option name="micronaut.processing.group" value="com.ingendevelopment" />
         <option name="micronaut.processing.incremental" value="true" />
-        <option name="micronaut.processing.module" value="employee_directory" />
+        <option name="micronaut.processing.module" value="employee_access" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.serde/micronaut-serde-processor/2.12.1/ee94f6526c3485e891b8fe9c10a71547f8f025d6/micronaut-serde-processor-2.12.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.serde/micronaut-serde-api/2.12.1/2cbaf21eb49af2110cbd4a250cf6cd91000215ad/micronaut-serde-api-2.12.1.jar" />
@@ -39,14 +39,14 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.inject/jakarta.inject-api/2.0.1/4c28afe1991a941d7702fe1362c365f0a8641d1e/jakarta.inject-api-2.0.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.javaparser/javaparser-core/3.26.3/aa91fa91359b1db13695f9c908a2795766ebc9a9/javaparser-core-3.26.3.jar" />
         </processorPath>
-        <module name="employee_directory.main" />
+        <module name="employee_access.main" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <option name="micronaut.processing.annotations" value="com.ingendevelopment.*" />
         <option name="micronaut.processing.group" value="com.ingendevelopment" />
         <option name="micronaut.processing.incremental" value="true" />
-        <option name="micronaut.processing.module" value="employee_directory" />
+        <option name="micronaut.processing.module" value="employee_access" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.serde/micronaut-serde-processor/2.12.1/ee94f6526c3485e891b8fe9c10a71547f8f025d6/micronaut-serde-processor-2.12.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.micronaut.serde/micronaut-serde-api/2.12.1/2cbaf21eb49af2110cbd4a250cf6cd91000215ad/micronaut-serde-api-2.12.1.jar" />
@@ -72,7 +72,7 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/jakarta.inject/jakarta.inject-api/2.0.1/4c28afe1991a941d7702fe1362c365f0a8641d1e/jakarta.inject-api-2.0.1.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.github.javaparser/javaparser-core/3.26.3/aa91fa91359b1db13695f9c908a2795766ebc9a9/javaparser-core-3.26.3.jar" />
         </processorPath>
-        <module name="employee_directory.test" />
+        <module name="employee_access.test" />
       </profile>
     </annotationProcessing>
   </component>

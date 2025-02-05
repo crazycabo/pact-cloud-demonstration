@@ -11,6 +11,7 @@ on:
       - main
     paths:
       - 'infrastructure/aws/**'
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -24,7 +25,12 @@ jobs:
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.5.0
-        cli_config_credentials_token: ${{ secrets.TF_CLI_TOKEN }}
+
+    - name: Configure AWS Credentials
+      run: |
+        echo "Set AWS credentials from GitHub Secrets"
+        echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
 
     - name: Terraform initialize
       run: terraform init
