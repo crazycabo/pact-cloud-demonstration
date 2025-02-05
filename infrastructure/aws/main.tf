@@ -140,19 +140,21 @@ module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.10.0"
 
-  identifier = "packbroker-db"
-  engine     = "postgres"
-  engine_version = "15.2"
-  instance_class = "db.t3.micro"
+  identifier           = "packbroker-db"
+  engine               = "postgres"
+  engine_version       = "15.2"
+  major_engine_version = "15"
+  family               = "postgres15"
+  instance_class       = "db.t3.micro"
 
   allocated_storage = 20
   storage_encrypted = true
 
-  db_name  = "packbrokerdb"
-  username = "admin"
-  password = "password"
+  db_name                = "packbrokerdb"
+  username               = "admin"
+  password               = "password"
   vpc_security_group_ids = [aws_security_group.pact_broker_alb_sg.id]
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids             = module.vpc.private_subnets
 
   publicly_accessible = false
 }
