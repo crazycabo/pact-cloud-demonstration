@@ -2,6 +2,17 @@ provider "aws" {
   region = "${var.region}"
 }
 
+terraform {
+  backend "s3" {
+    bucket         = "terraform-state-pactdemo-purdueglobal"
+    key            = "terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "terraform-locks-pactdemo-purdueglobal"
+  }
+}
+
+
 # ----------
 # VPC
 # ----------
