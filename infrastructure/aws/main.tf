@@ -96,22 +96,12 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
 # ECS
 # ----------
 resource "aws_cloudwatch_log_group" "pactbroker" {
-  name = "pactbroker"
+  name              = "/ecs/pactbroker"
+  retention_in_days = 7
 }
 
 resource "aws_ecs_cluster" "pactbroker_app_cluster" {
   name = "pactbroker-app-cluster"
-
-  configuration {
-    execute_command_configuration {
-      logging = "OVERRIDE"
-
-      log_configuration {
-        cloud_watch_encryption_enabled = false
-        cloud_watch_log_group_name     = aws_cloudwatch_log_group.pactbroker.name
-      }
-    }
-  }
 }
 
 resource "aws_ecs_task_definition" "pactbroker_app_task" {
@@ -133,6 +123,14 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options   = {
+          awslogs-group         = "/ecs/pactbroker"
+          awslogs-region        = "us-east-1"
+          awslogs-stream-prefix = "ecs"
+        }
+      }
     }
   ])
 }
