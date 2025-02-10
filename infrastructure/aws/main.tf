@@ -36,6 +36,10 @@ data "aws_ssm_parameter" "pact_readonly_password" {
   name = "/pact/pactBrokerReadOnlyPassword"
 }
 
+data "aws_route53_zone" "ingendev_zone" {
+  name = "ingendevelopment.com"
+}
+
 # ----------
 # VPC
 # ----------
@@ -306,12 +310,8 @@ module "rds" {
 # ----------
 # DNS
 # ----------
-resource "aws_route53_zone" "ingendev_app_zone" {
-  name = "ingendevelopment.com"
-}
-
 resource "aws_route53_record" "pactbroker_db_record" {
-  zone_id = aws_route53_zone.ingendev_app_zone.zone_id
+  zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.database.ingendevelopment.com"
   type    = "CNAME"
   ttl     = 300
@@ -319,7 +319,7 @@ resource "aws_route53_record" "pactbroker_db_record" {
 }
 
 resource "aws_route53_record" "packbroker_app_record" {
-  zone_id = aws_route53_zone.ingendev_app_zone.zone_id
+  zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
   type    = "A"
 
