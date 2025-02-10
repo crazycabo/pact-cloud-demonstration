@@ -194,7 +194,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
         },
         {
           "name": "PACT_BROKER_ALLOW_PUBLIC_READ",
-          "value": true
+          "value": "true"
         },
         {
           "name": "PACT_BROKER_LOG_LEVEL",
