@@ -95,8 +95,21 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
 # ----------
 # ECS
 # ----------
+resource "aws_cloudwatch_log_group" "pactbroker" {
+  name = "pactbroker"
+}
+
 resource "aws_ecs_cluster" "pactbroker_app_cluster" {
   name = "pactbroker-app-cluster"
+
+  configuration {
+    execute_command_configuration {
+      log_configuration {
+        cloud_watch_encryption_enabled = true
+        cloud_watch_log_group_name     = aws_cloudwatch_log_group.pactbroker.name
+      }
+    }
+  }
 }
 
 resource "aws_ecs_task_definition" "pactbroker_app_task" {
