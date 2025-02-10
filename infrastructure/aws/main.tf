@@ -80,17 +80,15 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
 }
 
 resource "aws_lb_target_group" "pact_broker_lb_target_group" {
-  name     = "pact-broker-lb-target-group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = module.vpc.vpc_id
+  name        = "pact-broker-lb-target-group"
+  port        = 9292
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = module.vpc.vpc_id
 
   health_check {
-    path                = "/"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    matcher   = "200,301,302"
+    path      = "/diagnostic/status/heartbeat"
   }
 }
 
@@ -153,9 +151,9 @@ module "rds" {
 
   identifier           = "packbroker-db"
   engine               = "postgres"
-  engine_version       = "15.2"
-  major_engine_version = "15"
-  family               = "postgres15"
+  engine_version       = "16.6"
+  major_engine_version = "16"
+  family               = "postgres16"
   instance_class       = "db.t3.micro"
 
   allocated_storage = 20
