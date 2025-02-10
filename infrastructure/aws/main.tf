@@ -171,7 +171,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
         },
         {
           "name": "PACT_BROKER_DATABASE_HOST",
-          "value": aws_route53_record.pactbroker_db_record.fqdn
+          "value": module.rds.db_instance_endpoint
         },
         {
           "name": "PACT_BROKER_DATABASE_NAME",
@@ -311,14 +311,6 @@ module "rds" {
 # ----------
 # DNS
 # ----------
-resource "aws_route53_record" "pactbroker_db_record" {
-  zone_id = data.aws_route53_zone.ingendev_zone.zone_id
-  name    = "pactbroker.database.ingendevelopment.com"
-  type    = "CNAME"
-  ttl     = 300
-  records = [module.rds.db_instance_endpoint]
-}
-
 resource "aws_route53_record" "packbroker_app_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
