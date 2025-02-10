@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 terraform {
@@ -145,6 +145,26 @@ resource "aws_ecs_service" "pactbroker_app_service" {
 # ----------
 # RDS
 # ----------
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-security-group"
+  description = "Security group for RDS"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [aws_security_group.pact_broker_alb_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.10.0"
@@ -162,7 +182,7 @@ module "rds" {
   db_name                = "packbrokerdb"
   username               = "pactbrokeradmin"
   password               = "Kate0522"
-  vpc_security_group_ids = [aws_security_group.pact_broker_alb_sg.id]
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
   subnet_ids             = module.vpc.private_subnets
 
   publicly_accessible = false
