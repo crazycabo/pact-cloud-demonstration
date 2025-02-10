@@ -37,7 +37,8 @@ data "aws_ssm_parameter" "pact_readonly_password" {
 }
 
 data "aws_route53_zone" "ingendev_zone" {
-  name = "ingendevelopment.com"
+  name    = "ingendevelopment.com"
+  zone_id = "Z335VPT70R7AG4"
 }
 
 # ----------
