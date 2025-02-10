@@ -142,8 +142,8 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
       essential = true
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 9292
+          hostPort      = 9292
           protocol      = "tcp"
         }
       ]
@@ -251,7 +251,7 @@ resource "aws_ecs_service" "pactbroker_app_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.pact_broker_lb_target_group.arn
     container_name   = "pactbroker"
-    container_port   = 80
+    container_port   = 9292
   }
 }
 
