@@ -44,7 +44,7 @@ jobs:
       run: terraform plan -out=tf_plan_pact_aws
       working-directory: infrastructure/aws
 
-#    - name: Terraform apply (main only)
-#      if: github.ref == 'refs/heads/main'
-#      run: terraform apply -auto-approve tf_plan_pact_aws
-#      working-directory: infrastructure/aws
+    - name: Terraform apply (main only)
+      if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve tf_plan_pact_aws
+      working-directory: infrastructure/aws
