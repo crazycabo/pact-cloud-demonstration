@@ -272,8 +272,9 @@ resource "aws_ecs_service" "pactbroker_app_service" {
   launch_type = "FARGATE"
 
   network_configuration {
-    subnets         = module.vpc.private_subnets
-    security_groups = [aws_security_group.pact_broker_alb_sg.id]
+    subnets          = module.vpc.private_subnets
+    security_groups  = [aws_security_group.ecs_sg.id]
+    assign_public_ip = false
   }
 
   load_balancer {
