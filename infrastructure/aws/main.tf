@@ -81,7 +81,7 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
 
 resource "aws_lb_target_group" "pact_broker_lb_target_group" {
   name        = "pact-broker-lb-target-group"
-  port        = 9292
+  port        = 80
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = module.vpc.vpc_id
@@ -160,8 +160,8 @@ module "rds" {
   storage_encrypted = true
 
   db_name                = "packbrokerdb"
-  username               = "admin"
-  password               = "password"
+  username               = "pactbrokeradmin"
+  password               = "Kate0522"
   vpc_security_group_ids = [aws_security_group.pact_broker_alb_sg.id]
   subnet_ids             = module.vpc.private_subnets
 
