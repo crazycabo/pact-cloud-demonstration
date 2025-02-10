@@ -12,6 +12,29 @@ terraform {
   }
 }
 
+data "aws_ssm_parameter" "rds_username" {
+  name = "/pact/pactBrokerRDSUsername"
+}
+
+data "aws_ssm_parameter" "rds_password" {
+  name = "/pact/pactBrokerRDSPassword"
+}
+
+data "aws_ssm_parameter" "pact_username" {
+  name = "/pact/pactBrokerUsername"
+}
+
+data "aws_ssm_parameter" "pact_password" {
+  name = "/pact/pactBrokerPassword"
+}
+
+data "aws_ssm_parameter" "pact_readonly_username" {
+  name = "/pact/pactBrokerReadOnlyUsername"
+}
+
+data "aws_ssm_parameter" "pact_readonly_password" {
+  name = "/pact/pactBrokerReadOnlyPassword"
+}
 
 # ----------
 # VPC
@@ -132,6 +155,60 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
           awslogs-stream-prefix = "ecs"
         }
       }
+      environment = [
+        {
+          name = "PACT_BROKER_DATABASE_USERNAME",
+          value = data.aws_ssm_parameter.rds_username.value
+        },
+        {
+          name = "PACT_BROKER_DATABASE_PASSWORD",
+          value = data.aws_ssm_parameter.rds_password.value
+        },
+        {
+          "name": "PACT_BROKER_DATABASE_HOST",
+          "value": module.rds.db_instance_address
+        },
+        {
+          "name": "PACT_BROKER_DATABASE_NAME",
+          "value": module.rds.db_instance_name
+        },
+        {
+          "name": "PACT_BROKER_PUMA_PERSISTENT_TIMEOUT",
+          "value": "120"
+        },
+        {
+          "name": "PACT_BROKER_BASIC_AUTH_USERNAME",
+          "value": data.aws_ssm_parameter.pact_username.value
+        },
+        {
+          "name": "PACT_BROKER_BASIC_AUTH_PASSWORD",
+          "value": data.aws_ssm_parameter.pact_password.value
+        },
+        {
+          "name": "PACT_BROKER_BASIC_AUTH_READ_ONLY_USERNAME",
+          "value": data.aws_ssm_parameter.pact_readonly_username.value
+        },
+        {
+          "name": "PACT_BROKER_BASIC_AUTH_READ_ONLY_PASSWORD",
+          "value": data.aws_ssm_parameter.pact_readonly_password.value
+        },
+        {
+          "name": "PACT_BROKER_ALLOW_PUBLIC_READ",
+          "value": true
+        },
+        {
+          "name": "PACT_BROKER_LOG_LEVEL",
+          "value": "INFO"
+        },
+        {
+          "name": "PACT_BROKER_PUBLIC_HEARTBEAT",
+          "value": "true"
+        },
+        {
+          "name": "PACT_BROKER_WEBHOOK_HOST_WHITELIST",
+          "value": ""
+        }
+      ]
     }
   ])
 }
@@ -216,8 +293,8 @@ module "rds" {
   storage_encrypted = true
 
   db_name                = "packbrokerdb"
-  username               = "pactbrokeradmin"
-  password               = "Kate0522"
+  username               = data.aws_ssm_parameter.rds_username.value
+  password               = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   create_db_subnet_group = true
