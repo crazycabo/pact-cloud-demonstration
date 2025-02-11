@@ -238,6 +238,10 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
           value = data.aws_ssm_parameter.rds_password.value
         },
         {
+          name  = "PACT_BROKER_DATABASE_SSLMODE",
+          value = "require"
+        },
+        {
           "name": "PACT_BROKER_DATABASE_HOST",
           "value": aws_route53_record.pactbroker_db_record.name
         },
