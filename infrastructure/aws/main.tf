@@ -135,7 +135,7 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
   }
 }
 
-resource "aws_lb_listener_rule" "pact_broker" {
+resource "aws_lb_listener_rule" "pact_broker_http" {
   listener_arn = aws_lb_listener.pact_broker_lb_http_listener.arn
 
   action {
@@ -146,6 +146,26 @@ resource "aws_lb_listener_rule" "pact_broker" {
   condition {
     path_pattern {
       values = ["/*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "alb_health_http" {
+  listener_arn = aws_lb_listener.pact_broker_lb_http_listener.arn
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "ALB is OK I guess"
+      status_code  = "200"
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/albhealth"]
     }
   }
 }
@@ -400,4 +420,11 @@ resource "aws_route53_record" "packbroker_app_record" {
     zone_id                = aws_lb.pact_broker_lb.zone_id
     evaluate_target_health = true
   }
+}
+
+resource "aws_route53_record" "packbroker_db_record" {
+  zone_id = data.aws_route53_zone.ingendev_zone.zone_id
+  name    = "pactdb.ingendevelopment.com"
+  type    = "CNAME"
+  records = [module.rds.db_instance_address]
 }
