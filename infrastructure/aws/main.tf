@@ -436,7 +436,7 @@ module "rds" {
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   create_db_subnet_group = true
-  subnet_ids             = [module.vpc.private_subnets, module.vpc.public_subnets]
+  subnet_ids             = merge(module.vpc.private_subnets, module.vpc.public_subnets)
 
   publicly_accessible    = true
 
