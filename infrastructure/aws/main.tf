@@ -332,8 +332,6 @@ resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs_logs" {
   role       = aws_iam_role.packbroker_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-
-  tags = var.tags
 }
 
 resource "aws_ecs_service" "pactbroker_app_service" {
@@ -385,8 +383,6 @@ resource "aws_appautoscaling_policy" "pact_broker_cpu" {
     scale_out_cooldown = 60
     scale_in_cooldown  = 300
   }
-
-  tags = var.tags
 }
 
 # ----------
@@ -414,8 +410,6 @@ resource "aws_security_group_rule" "rds_allow_ecs" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.rds_sg.id
   source_security_group_id = aws_security_group.ecs_sg.id
-
-  tags = var.tags
 }
 
 module "rds" {
@@ -458,8 +452,6 @@ resource "aws_route53_record" "packbroker_app_record" {
     zone_id                = aws_lb.pact_broker_lb.zone_id
     evaluate_target_health = true
   }
-
-  tags = var.tags
 }
 
 resource "aws_route53_record" "packbroker_db_record" {
@@ -467,6 +459,4 @@ resource "aws_route53_record" "packbroker_db_record" {
   name    = "pactdb.ingendevelopment.com"
   type    = "CNAME"
   records = [module.rds.db_instance_address]
-
-  tags = var.tags
 }
