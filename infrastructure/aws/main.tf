@@ -66,6 +66,8 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group  = true
   create_flow_log_cloudwatch_iam_role   = true
   flow_log_max_aggregation_interval     = 60
+
+  tags = var.tags
 }
 
 # ----------
@@ -96,6 +98,8 @@ resource "aws_security_group" "pact_broker_alb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb" "pact_broker_lb" {
@@ -104,6 +108,8 @@ resource "aws_lb" "pact_broker_lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.pact_broker_alb_sg.id]
   subnets            = module.vpc.public_subnets
+
+  tags = var.tags
 }
 
 resource "aws_lb_target_group" "pact_broker_lb_target_group" {
@@ -117,6 +123,8 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
     matcher   = "200,301,302"
     path      = "/diagnostic/status/heartbeat"
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb_listener" "pact_broker_lb_http_listener" {
@@ -133,6 +141,8 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
       status_code  = "503"
     }
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb_listener_rule" "pact_broker_http" {
@@ -148,6 +158,8 @@ resource "aws_lb_listener_rule" "pact_broker_http" {
       values = ["/*"]
     }
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb_listener_rule" "alb_health_http" {
@@ -168,6 +180,8 @@ resource "aws_lb_listener_rule" "alb_health_http" {
       values = ["/albhealth"]
     }
   }
+
+  tags = var.tags
 }
 
 # ----------
@@ -176,10 +190,14 @@ resource "aws_lb_listener_rule" "alb_health_http" {
 resource "aws_cloudwatch_log_group" "pactbroker" {
   name              = "/ecs/pactbroker"
   retention_in_days = 7
+
+  tags = var.tags
 }
 
 resource "aws_ecs_cluster" "pactbroker_app_cluster" {
   name = "pactbroker-app-cluster"
+
+  tags = var.tags
 }
 
 resource "aws_ecs_task_definition" "pactbroker_app_task" {
@@ -266,6 +284,8 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
       ]
     }
   ])
+
+  tags = var.tags
 }
 
 resource "aws_security_group" "ecs_sg" {
@@ -286,6 +306,8 @@ resource "aws_security_group" "ecs_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
@@ -303,11 +325,15 @@ resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
       }
     ]
   })
+
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_logs" {
   role       = aws_iam_role.packbroker_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+
+  tags = var.tags
 }
 
 resource "aws_ecs_service" "pactbroker_app_service" {
@@ -329,6 +355,8 @@ resource "aws_ecs_service" "pactbroker_app_service" {
     container_name   = "pactbroker"
     container_port   = 9292
   }
+
+  tags = var.tags
 }
 
 resource "aws_appautoscaling_target" "pact_broker" {
@@ -337,6 +365,8 @@ resource "aws_appautoscaling_target" "pact_broker" {
   resource_id        = "service/${aws_ecs_cluster.pactbroker_app_cluster.name}/${aws_ecs_service.pactbroker_app_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  tags = var.tags
 }
 
 resource "aws_appautoscaling_policy" "pact_broker_cpu" {
@@ -355,6 +385,8 @@ resource "aws_appautoscaling_policy" "pact_broker_cpu" {
     scale_out_cooldown = 60
     scale_in_cooldown  = 300
   }
+
+  tags = var.tags
 }
 
 # ----------
@@ -371,6 +403,8 @@ resource "aws_security_group" "rds_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "aws_security_group_rule" "rds_allow_ecs" {
@@ -380,6 +414,8 @@ resource "aws_security_group_rule" "rds_allow_ecs" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.rds_sg.id
   source_security_group_id = aws_security_group.ecs_sg.id
+
+  tags = var.tags
 }
 
 module "rds" {
@@ -405,6 +441,8 @@ module "rds" {
   subnet_ids             = module.vpc.private_subnets
 
   publicly_accessible = false
+
+  tags = var.tags
 }
 
 # ----------
@@ -420,6 +458,8 @@ resource "aws_route53_record" "packbroker_app_record" {
     zone_id                = aws_lb.pact_broker_lb.zone_id
     evaluate_target_health = true
   }
+
+  tags = var.tags
 }
 
 resource "aws_route53_record" "packbroker_db_record" {
@@ -427,4 +467,6 @@ resource "aws_route53_record" "packbroker_db_record" {
   name    = "pactdb.ingendevelopment.com"
   type    = "CNAME"
   records = [module.rds.db_instance_address]
+
+  tags = var.tags
 }
