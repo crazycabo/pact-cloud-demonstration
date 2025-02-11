@@ -206,7 +206,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.packbroker_ecs_task_execution_role.arn
+  execution_role_arn       = aws_iam_role.pactbroker_ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -239,7 +239,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
         },
         {
           "name": "PACT_BROKER_DATABASE_HOST",
-          "value": aws_route53_record.packbroker_db_record.name
+          "value": aws_route53_record.pactbroker_db_record.name
         },
         {
           "name": "PACT_BROKER_DATABASE_NAME",
@@ -310,8 +310,8 @@ resource "aws_security_group" "ecs_sg" {
   tags = var.tags
 }
 
-resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
-  name = "packbroker_ecs_task_execution_role"
+resource "aws_iam_role" "pactbroker_ecs_task_execution_role" {
+  name = "pactbroker_ecs_task_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -330,7 +330,7 @@ resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_logs" {
-  role       = aws_iam_role.packbroker_ecs_task_execution_role.name
+  role       = aws_iam_role.pactbroker_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -416,7 +416,7 @@ module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.10.0"
 
-  identifier           = "packbroker-db"
+  identifier           = "pactbroker-db"
   engine               = "postgres"
   engine_version       = "16.6"
   major_engine_version = "16"
@@ -426,7 +426,7 @@ module "rds" {
   allocated_storage = 20
   storage_encrypted = true
 
-  db_name                = "packbrokerdb"
+  db_name                = "pactbrokerdb"
   username               = data.aws_ssm_parameter.rds_username.value
   password               = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
@@ -442,7 +442,7 @@ module "rds" {
 # ----------
 # DNS
 # ----------
-resource "aws_route53_record" "packbroker_app_record" {
+resource "aws_route53_record" "pactbroker_app_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
   type    = "A"
@@ -454,7 +454,7 @@ resource "aws_route53_record" "packbroker_app_record" {
   }
 }
 
-resource "aws_route53_record" "packbroker_db_record" {
+resource "aws_route53_record" "pactbroker_db_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactdb.ingendevelopment.com"
   type    = "CNAME"
