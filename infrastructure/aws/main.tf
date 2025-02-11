@@ -112,8 +112,13 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.pact_broker_lb_target_group.arn
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Default ALB Action"
+      status_code  = "503"
+    }
   }
 }
 
@@ -232,6 +237,13 @@ resource "aws_security_group" "ecs_sg" {
   name        = "pactbroker-ecs-security-group"
   description = "Allow outbound access to RDS from broker"
   vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    security_groups = [aws_security_group.pact_broker_alb_sg.id]
+  }
 
   egress {
     from_port   = 0
