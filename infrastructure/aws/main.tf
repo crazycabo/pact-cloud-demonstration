@@ -446,7 +446,6 @@ resource "aws_route53_record" "packbroker_app_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
   type    = "A"
-  ttl     = 300
 
   alias {
     name                   = aws_lb.pact_broker_lb.dns_name
