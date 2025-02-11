@@ -45,6 +45,6 @@ jobs:
       working-directory: infrastructure/aws
 
     - name: Terraform apply (main only)
-      if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
+      if: github.event_name == 'workflow_dispatch'
       run: terraform apply -auto-approve tf_plan_pact_aws
       working-directory: infrastructure/aws
