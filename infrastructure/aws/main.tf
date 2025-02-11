@@ -106,6 +106,19 @@ resource "aws_lb" "pact_broker_lb" {
   subnets            = module.vpc.public_subnets
 }
 
+resource "aws_lb_target_group" "pact_broker_lb_target_group" {
+  name        = "pact-broker-lb-target-group"
+  port        = 9292
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = module.vpc.vpc_id
+
+  health_check {
+    matcher   = "200,301,302"
+    path      = "/diagnostic/status/heartbeat"
+  }
+}
+
 resource "aws_lb_listener" "pact_broker_lb_http_listener" {
   load_balancer_arn = aws_lb.pact_broker_lb.arn
   port              = 80
@@ -122,16 +135,18 @@ resource "aws_lb_listener" "pact_broker_lb_http_listener" {
   }
 }
 
-resource "aws_lb_target_group" "pact_broker_lb_target_group" {
-  name        = "pact-broker-lb-target-group"
-  port        = 9292
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = module.vpc.vpc_id
+resource "aws_lb_listener_rule" "pact_broker" {
+  listener_arn = aws_lb_listener.pact_broker_lb_http_listener.arn
 
-  health_check {
-    matcher   = "200,301,302"
-    path      = "/diagnostic/status/heartbeat"
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.pact_broker_lb_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
   }
 }
 
