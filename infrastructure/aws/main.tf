@@ -239,7 +239,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
         },
         {
           "name": "PACT_BROKER_DATABASE_HOST",
-          "value": module.rds.db_instance_endpoint
+          "value": aws_route53_record.packbroker_db_record.name
         },
         {
           "name": "PACT_BROKER_DATABASE_NAME",
