@@ -446,6 +446,7 @@ resource "aws_route53_record" "packbroker_app_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
   type    = "A"
+  ttl     = 300
 
   alias {
     name                   = aws_lb.pact_broker_lb.dns_name
@@ -458,5 +459,6 @@ resource "aws_route53_record" "packbroker_db_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactdb.ingendevelopment.com"
   type    = "CNAME"
+  ttl     = 300
   records = [module.rds.db_instance_address]
 }
