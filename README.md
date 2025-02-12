@@ -10,9 +10,11 @@ Communication through a centralized Pact broker instance decouples consumer and 
 Some cloud configuration steps are required to be performed manually outside of Terraform execution.
 
 1. Create an S3 bucket using the AWS CLI:
-   `aws s3api create-bucket --bucket terraform-state-pactdemo-purdueglobal --region us-east-1`
-   `aws s3api put-bucket-versioning --bucket terraform-state-pactdemo-purdueglobal --versioning-configuration Status=Enabled`
-2. Create a DynamoDB table to store state-locking information:
+   ```
+   aws s3api create-bucket --bucket terraform-state-pactdemo-purdueglobal --region us-east-1
+   aws s3api put-bucket-versioning --bucket terraform-state-pactdemo-purdueglobal --versioning-configuration Status=Enabled
+   ```
+3. Create a DynamoDB table to store state-locking information:
    ```
    aws dynamodb create-table --table-name terraform-locks-pactdemo-purdueglobal \                                               ✔  07:20:27 PM  
    --attribute-definitions AttributeName=LockID,AttributeType=S \
