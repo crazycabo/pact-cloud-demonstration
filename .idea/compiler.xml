@@ -75,5 +75,13 @@
         <module name="employee_access.test" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="1.6">
+      <module name="employee_access" target="21" />
+      <module name="employee_access.main" target="21" />
+      <module name="employee_access.test" target="21" />
+      <module name="employee_directory" target="21" />
+      <module name="employee_directory.main" target="21" />
+      <module name="employee_directory.test" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>

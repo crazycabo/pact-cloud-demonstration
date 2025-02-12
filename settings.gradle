@@ -1,0 +1,3 @@
+rootProject.name = 'pact-cloud-demonstration'
+includeBuild('applications/employee_access')
+includeBuild('applications/employee_directory')
