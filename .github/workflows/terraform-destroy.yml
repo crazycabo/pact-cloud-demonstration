@@ -2,12 +2,24 @@ name: Destroy AWS infrastructure
 
 on:
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type 'confirm' to proceed with destruction"
+        required: true
+        default: "cancel"
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Verify confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "confirm" ]; then
+            echo "Destruction not confirmed. Exiting..."
+            exit 1
+          fi
+      
       - name: Repository checkout
         uses: actions/checkout@v3
 
@@ -27,6 +39,6 @@ jobs:
         working-directory: infrastructure/aws
 
       - name: Terraform destroy
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'workflow_dispatch'
         run: terraform destroy -auto-approve
         working-directory: infrastructure/aws

@@ -66,6 +66,8 @@ module "vpc" {
   create_flow_log_cloudwatch_log_group  = true
   create_flow_log_cloudwatch_iam_role   = true
   flow_log_max_aggregation_interval     = 60
+
+  tags = var.tags
 }
 
 # ----------
@@ -96,6 +98,8 @@ resource "aws_security_group" "pact_broker_alb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "aws_lb" "pact_broker_lb" {
@@ -104,17 +108,8 @@ resource "aws_lb" "pact_broker_lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.pact_broker_alb_sg.id]
   subnets            = module.vpc.public_subnets
-}
 
-resource "aws_lb_listener" "pact_broker_lb_http_listener" {
-  load_balancer_arn = aws_lb.pact_broker_lb.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.pact_broker_lb_target_group.arn
-  }
+  tags = var.tags
 }
 
 resource "aws_lb_target_group" "pact_broker_lb_target_group" {
@@ -128,6 +123,65 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
     matcher   = "200,301,302"
     path      = "/diagnostic/status/heartbeat"
   }
+
+  tags = var.tags
+}
+
+resource "aws_lb_listener" "pact_broker_lb_http_listener" {
+  load_balancer_arn = aws_lb.pact_broker_lb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Default ALB Action"
+      status_code  = "503"
+    }
+  }
+
+  tags = var.tags
+}
+
+resource "aws_lb_listener_rule" "pact_broker_http" {
+  listener_arn = aws_lb_listener.pact_broker_lb_http_listener.arn
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.pact_broker_lb_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/*"]
+    }
+  }
+
+  tags = var.tags
+}
+
+resource "aws_lb_listener_rule" "alb_health_http" {
+  listener_arn = aws_lb_listener.pact_broker_lb_http_listener.arn
+
+  action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "ALB is OK I guess"
+      status_code  = "200"
+    }
+  }
+
+  condition {
+    path_pattern {
+      values = ["/albhealth"]
+    }
+  }
+
+  tags = var.tags
 }
 
 # ----------
@@ -136,10 +190,14 @@ resource "aws_lb_target_group" "pact_broker_lb_target_group" {
 resource "aws_cloudwatch_log_group" "pactbroker" {
   name              = "/ecs/pactbroker"
   retention_in_days = 7
+
+  tags = var.tags
 }
 
 resource "aws_ecs_cluster" "pactbroker_app_cluster" {
   name = "pactbroker-app-cluster"
+
+  tags = var.tags
 }
 
 resource "aws_ecs_task_definition" "pactbroker_app_task" {
@@ -148,7 +206,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = "256"
   memory                   = "512"
-  execution_role_arn       = aws_iam_role.packbroker_ecs_task_execution_role.arn
+  execution_role_arn       = aws_iam_role.pactbroker_ecs_task_execution_role.arn
 
   container_definitions = jsonencode([
     {
@@ -180,8 +238,12 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
           value = data.aws_ssm_parameter.rds_password.value
         },
         {
+          name  = "PACT_BROKER_DATABASE_SSLMODE",
+          value = "require"
+        },
+        {
           "name": "PACT_BROKER_DATABASE_HOST",
-          "value": module.rds.db_instance_endpoint
+          "value": aws_route53_record.pactbroker_db_record.name
         },
         {
           "name": "PACT_BROKER_DATABASE_NAME",
@@ -226,6 +288,8 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
       ]
     }
   ])
+
+  tags = var.tags
 }
 
 resource "aws_security_group" "ecs_sg" {
@@ -233,16 +297,25 @@ resource "aws_security_group" "ecs_sg" {
   description = "Allow outbound access to RDS from broker"
   vpc_id      = module.vpc.vpc_id
 
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "tcp"
+    security_groups = [aws_security_group.pact_broker_alb_sg.id]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
-resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
-  name = "packbroker_ecs_task_execution_role"
+resource "aws_iam_role" "pactbroker_ecs_task_execution_role" {
+  name = "pactbroker_ecs_task_execution_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -256,10 +329,12 @@ resource "aws_iam_role" "packbroker_ecs_task_execution_role" {
       }
     ]
   })
+
+  tags = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_logs" {
-  role       = aws_iam_role.packbroker_ecs_task_execution_role.name
+  role       = aws_iam_role.pactbroker_ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
@@ -282,14 +357,18 @@ resource "aws_ecs_service" "pactbroker_app_service" {
     container_name   = "pactbroker"
     container_port   = 9292
   }
+
+  tags = var.tags
 }
 
 resource "aws_appautoscaling_target" "pact_broker" {
-  max_capacity       = 2
+  max_capacity       = 1
   min_capacity       = 1
   resource_id        = "service/${aws_ecs_cluster.pactbroker_app_cluster.name}/${aws_ecs_service.pactbroker_app_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
+
+  tags = var.tags
 }
 
 resource "aws_appautoscaling_policy" "pact_broker_cpu" {
@@ -324,6 +403,8 @@ resource "aws_security_group" "rds_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.tags
 }
 
 resource "aws_security_group_rule" "rds_allow_ecs" {
@@ -339,7 +420,7 @@ module "rds" {
   source  = "terraform-aws-modules/rds/aws"
   version = "6.10.0"
 
-  identifier           = "packbroker-db"
+  identifier           = "pactbroker-db"
   engine               = "postgres"
   engine_version       = "16.6"
   major_engine_version = "16"
@@ -349,7 +430,7 @@ module "rds" {
   allocated_storage = 20
   storage_encrypted = true
 
-  db_name                = "packbrokerdb"
+  db_name                = "pactbrokerdb"
   username               = data.aws_ssm_parameter.rds_username.value
   password               = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
@@ -357,13 +438,15 @@ module "rds" {
   create_db_subnet_group = true
   subnet_ids             = module.vpc.private_subnets
 
-  publicly_accessible = false
+  publicly_accessible    = false
+
+  tags = var.tags
 }
 
 # ----------
 # DNS
 # ----------
-resource "aws_route53_record" "packbroker_app_record" {
+resource "aws_route53_record" "pactbroker_app_record" {
   zone_id = data.aws_route53_zone.ingendev_zone.zone_id
   name    = "pactbroker.ingendevelopment.com"
   type    = "A"
@@ -373,4 +456,12 @@ resource "aws_route53_record" "packbroker_app_record" {
     zone_id                = aws_lb.pact_broker_lb.zone_id
     evaluate_target_health = true
   }
+}
+
+resource "aws_route53_record" "pactbroker_db_record" {
+  zone_id = data.aws_route53_zone.ingendev_zone.zone_id
+  name    = "pactdb.ingendevelopment.com"
+  type    = "CNAME"
+  ttl     = 300
+  records = [module.rds.db_instance_address]
 }
