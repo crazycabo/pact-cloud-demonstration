@@ -30,3 +30,15 @@ Some cloud configuration steps are required to be performed manually outside of 
    /pact/pactBrokerReadOnlyUsername (String)
    /pact/pactBrokerReadOnlyPassword (Secure String)
    ```
+
+## Build / Terraform Workflows
+This project consists of two Micronaut web applications, employee-status and employee-directory. The employee status application is a consumer of the employee directory and contains a Pact test the provider must execute to validate the contract between the two.
+
+All AWS cloud infrastructure is deployable through Terraform consisting of:
+- VPC with public and private subnets and flow logs enabled
+- ALB accepting TLS connections forwarding requests to port 9292
+- ECS cluster with Pact broker task definition using Fargate
+- RDS PostgreSQL v16 database only available through private subnets
+- DNS entries for the load balancer and database
+
+A single Micronaut GitHub workflow builds each web application using conditionals. Two Terraform workflows deploy everything and destroy on-demand. The deployment workflow always runs in pull requests up to the plan action. Applying changes requires manual dispatch and confirmation. The destruction workflow must be performed via dispatch and requires entering the 'confirm' keyword to execute.
