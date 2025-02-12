@@ -31,7 +31,7 @@ Some cloud configuration steps are required to be performed manually outside of 
    /pact/pactBrokerReadOnlyPassword (Secure String)
    ```
 
-## Build / Terraform Workflows
+## Build Micronaut Apps / Terraform (AWS)
 This project consists of two Micronaut web applications, employee-status and employee-directory. The employee status application is a consumer of the employee directory and contains a Pact test the provider must execute to validate the contract between the two.
 
 All AWS cloud infrastructure is deployable through Terraform consisting of:
@@ -42,3 +42,8 @@ All AWS cloud infrastructure is deployable through Terraform consisting of:
 - DNS entries for the load balancer and database
 
 A single Micronaut GitHub workflow builds each web application using conditionals. Two Terraform workflows deploy everything and destroy on-demand. The deployment workflow always runs in pull requests up to the plan action. Applying changes requires manual dispatch and confirmation. The destruction workflow must be performed via dispatch and requires entering the 'confirm' keyword to execute.
+
+### Workflows
+1. __Deployment__: Deploy the Pact broker and provision all required resources.
+2. __Micronaut__: Build projects and verify Pacts between applications.
+3. __Destroy__: Remove everything.
