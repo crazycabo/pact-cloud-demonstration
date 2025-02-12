@@ -21,3 +21,12 @@ Some cloud configuration steps are required to be performed manually outside of 
    --key-schema AttributeName=LockID,KeyType=HASH \
    --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
    ```
+3. Create the following list of SSM Systems Manager secrets and input appropriate values:
+   ```
+   /pact/pactBrokerRDSUsername (String)
+   /pact/pactBrokerRDSPassword (Secure String)
+   /pact/pactBrokerUsername (String)
+   /pact/pactBrokerPassword (Secure String)
+   /pact/pactBrokerReadOnlyUsername (String)
+   /pact/pactBrokerReadOnlyPassword (Secure String)
+   ```
