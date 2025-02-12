@@ -235,7 +235,7 @@ resource "aws_ecs_task_definition" "pactbroker_app_task" {
         },
         {
           name = "PACT_BROKER_DATABASE_PASSWORD",
-          value = "Kate0522"
+          value = data.aws_ssm_parameter.rds_password.value
         },
         {
           name  = "PACT_BROKER_DATABASE_SSLMODE",
@@ -432,7 +432,7 @@ module "rds" {
 
   db_name                = "pactbrokerdb"
   username               = data.aws_ssm_parameter.rds_username.value
-  password               = "Kate0522"
+  password               = data.aws_ssm_parameter.rds_password.value
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   create_db_subnet_group = true
